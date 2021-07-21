@@ -58,7 +58,7 @@ const renderCountry = function (data, className = '') {
 
 // Sequence of AJAX calls
 
-const getCountryAndNeighbour = function (country) {
+/*const getCountryAndNeighbour = function (country) {
   //XML http request function (outdated way to to requests)
   // AJAX call country 1
   const request = new XMLHttpRequest();
@@ -85,4 +85,35 @@ const getCountryAndNeighbour = function (country) {
   });
 };
 
-getCountryAndNeighbour('germany');
+getCountryAndNeighbour('germany');*/
+
+//////// Promises and the fetch API, Consuming promises ////////
+// old way
+// const request = new XMLHttpRequest();
+// request.open('GET', `https://restcountries.eu/rest/v2/name/${country}`); // 1st argument: type of request   2nd: url
+// request.send();
+
+// new way
+const request = fetch(`https://restcountries.eu/rest/v2/name/portugal`);
+console.log(request);
+
+/*const getCountryData = function (country) {
+  fetch(`https://restcountries.eu/rest/v2/name/${country}`)
+    .then(function (response) {
+      console.log(response);
+      return response.json(); // to read data we need to call json method on reponse
+    })
+    .then(function ([data]) {
+      console.log(data);
+      renderCountry(data);
+    });
+};*/
+
+// refactored
+const getCountryData = function (country) {
+  fetch(`https://restcountries.eu/rest/v2/name/${country}`)
+    .then(response => response.json())
+    .then(([data]) => renderCountry(data));
+};
+
+getCountryData('portugal');
