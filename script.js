@@ -99,8 +99,8 @@ getCountryAndNeighbour('germany');*/
 // request.send();
 
 // new way
-const request = fetch(`https://restcountries.eu/rest/v2/name/portugal`);
-console.log(request);
+// const request = fetch(`https://restcountries.eu/rest/v2/name/portugal`);
+// console.log(request);
 
 /*const getCountryData = function (country) {
   fetch(`https://restcountries.eu/rest/v2/name/${country}`)
@@ -114,18 +114,33 @@ console.log(request);
     });
 };*/
 
+// helper function
+const getJSON = function (url, errorMsg = 'Something went wrong') {
+  return fetch(url).then(response => {
+    if (!response.ok)
+      // ok = status 200, everything is fine
+      throw new Error(`${errorMsg} (${response.status})`); // status displays the type of error, throw immediately terminate current function just like return and propagate down to the catch method
+    return response.json();
+  });
+};
+
 // refactored
 const getCountryData = function (country) {
   // country 1
-  fetch(`https://restcountries.eu/rest/v2/name/${country}`)
-    .then(response => response.json())
+  getJSON(
+    `https://restcountries.eu/rest/v2/name/${country}`,
+    `Country not found`
+  )
     .then(([data]) => {
       renderCountry(data);
       const neighbour = data.borders[0];
 
-      if (!neighbour) return;
+      if (!neighbour) throw new Error(`No neighbour found!`);
       // country 2
-      return fetch(`https://restcountries.eu/rest/v2/alpha/${neighbour}`);
+      return getJSON(
+        `https://restcountries.eu/rest/v2/alpha/${neighbour}`,
+        'Country not found'
+      );
     })
     .then(response => response.json())
     .then(data => renderCountry(data, 'neighbour'))
@@ -133,13 +148,19 @@ const getCountryData = function (country) {
       console.error(`${err} 💥`);
       renderErrorMsg(
         `Something went wrong 💥 ${err.message}. Please try again!`
-      );
+      ); // catches any error in the promise chain
     })
     .finally(() => {
-      countriesContainer.style.opacity = 1;
+      countriesContainer.style.opacity = 1; //
     });
 };
+
+// Then method only called when promise is fulfilled
+// Catch only while promise is reject4ed
+// Finally will always be called, no matter what (useful for loading spinner for example)
 
 btn.addEventListener('click', function () {
   getCountryData('germany');
 });
+
+getCountryData('Australia');
