@@ -166,6 +166,7 @@ btn.addEventListener('click', function () {
 getCountryData('Germany');
 
 //// Event Loop in Practice
+/*
 console.log('Test start');
 setTimeout(() => console.log('0 sec timer'), 0);
 Promise.resolve('Resolved promise 1').then(res => console.log(res));
@@ -174,4 +175,38 @@ Promise.resolve('Resolved Promise 2').then(res => {
   for (let i = 0; i < 1000000000; i++) {}
   console.log(res);
 });
-console.log('Test end');
+console.log('Test end');*/
+
+//// BUILDING A SIMPLE PROMISE
+const lotteryPromise = new Promise(function (resolve, reject) {
+  console.log('Lottery draw is happening');
+  setTimeout(function () {
+    if (Math.random() >= 0.5) {
+      resolve('You WIN 💵'); // resolve function sets promise as fulfilled
+    } else {
+      reject(new Error('You lost your money 💩')); // error message when rejected as argument
+    }
+  }, 2000);
+});
+
+lotteryPromise
+  .then(resolved => console.log(resolved)) // then method for the resolved state
+  .catch(err => console.error(err)); // catch method for the rejected state
+
+// Promisifying setTimeout
+const wait = function (seconds) {
+  return new Promise(function (resolve) {
+    // we dont need reject function because timer cannot fail, therefoer we will never mark this primise as rejected
+    setTimeout(resolve, seconds * 1000);
+  });
+};
+
+wait(2)
+  .then(() => {
+    console.log('I waited 2 seconds');
+    return wait(1);
+  })
+  .then(() => console.log('I waited 1 second'));
+
+Promise.resolve('abc').then(x => console.log(x));
+Promise.reject('Problem').catch(x => console.error(x));
